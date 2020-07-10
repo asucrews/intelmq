@@ -140,7 +140,16 @@ class MicrosoftInterflowCollectorBot(CollectorBot):
             report.add('feed.url', download_url)
             report.add('raw', raw)
             self.send_message(report)
-            self.cache.set(file['Name'], True)
+            # redis-py >= 3.0.0 does no longer support boolean values, cast to string explicitly, also for backwards compatibility
+            self.cache.set(file['Name'], "True")
+
+    def print_filelist(self):
+        """ Can be called from the debugger for example. """
+        self.logger.debug('Downloading file list.')
+        files = self.session.get(URL_LIST)
+        files.raise_for_status()
+        self.logger.debug('Downloaded file list, %s entries.', len(files.json()))
+        print(files.text)
 
 
 BOT = MicrosoftInterflowCollectorBot

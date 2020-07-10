@@ -19,7 +19,7 @@ class MailCollectorBot(CollectorBot):
             raise MissingDependencyError("imbox")
 
         if getattr(self.parameters, 'attach_unzip', None) and not self.extract_files:
-            self.parameters.extract_files = True
+            self.extract_files = True
             self.logger.warning("The parameter 'attach_unzip' is deprecated and will "
                                 "be removed in version 4.0. Use 'extract_files' instead.")
 
@@ -31,6 +31,8 @@ class MailCollectorBot(CollectorBot):
                               self.parameters.mail_user,
                               self.parameters.mail_password,
                               self.parameters.mail_ssl,
+                              # imbox itself uses ports 143/993 as default depending on SSL setting
+                              port=getattr(self.parameters, 'mail_port', None),
                               ssl_context=ssl_custom_context)
         return mailbox
 

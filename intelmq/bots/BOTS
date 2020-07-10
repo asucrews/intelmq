@@ -1,7 +1,7 @@
 {
     "Collector": {
         "AMQP": {
-            "description": "Collecting from a (remote) AMQP Server and fetching either intelmq or any other messages.",
+            "description": "Collecting from a (remote) AMQP Server and fetching either intelmq or any other messages. Requires the pika python library.",
             "module": "intelmq.bots.collectors.amqp.collector_amqp",
             "parameters": {
                 "connection_attempts": 3,
@@ -27,14 +27,6 @@
                 "provider": "APICollector"
             }
         },
-        "CertStream": {
-            "description": "A bot to collect information from CertStream",
-            "module": "intelmq.bots.collectors.calidog.collector_certstream",
-            "parameters": {
-                "name": "CertStream",
-                "provider": "Calidog"
-            }
-        },
         "File": {
             "description": "Fileinput collector fetches data from a file.",
             "module": "intelmq.bots.collectors.file.collector_file",
@@ -54,7 +46,7 @@
             "module": "intelmq.bots.collectors.mail.collector_mail_attach",
             "parameters": {
                 "attach_regex": "csv.zip",
-                "attach_unzip": true,
+                "extract_files": true,
                 "folder": "INBOX",
                 "mail_host": "<host>",
                 "mail_password": "<password>",
@@ -236,6 +228,37 @@
                 "rate_limit": 3600
             }
         },
+        "CertStream": {
+            "description": "A bot to collect information from CertStream",
+            "module": "intelmq.bots.collectors.calidog.collector_certstream",
+            "parameters": {
+                "name": "CertStream",
+                "provider": "Calidog"
+            }
+        },
+        "ESET ETI TAXII": {
+            "description": "Collect data from ESET's TAXII API",
+            "module": "intelmq.bots.collectors.eset.collector",
+            "parameters": {
+                "username": "<username>",
+                "password": "<password>",
+                "endpoint": "eti.eset.com",
+                "time_delta": 3600,
+                "collection": "<collection>"
+            }
+        },
+        "Github API": {
+            "description": "Collects files from github repository via the Github API. Optionally with github credentials.",
+            "module": "intelmq.bots.collectors.github_api.collector_github_contents_api",
+            "parameters": {
+                "basic_auth_password": "__PASSWORD__",
+                "basic_auth_username": "__USERNAME__",
+                "name": "__FEED__",
+                "provider": "__PROVIDER__",
+                "regex": ".*.json",
+                "repository": "StrangerealIntel/DailyIOC"
+            }
+        },
         "McAfee openDXL": {
             "description": "Listens to McAfee openDXL fabric",
             "module": "intelmq.bots.collectors.opendxl.collector",
@@ -249,12 +272,16 @@
             "description": "",
             "module": "intelmq.bots.collectors.microsoft.collector_azure",
             "parameters": {
-                "account_key": "",
-                "account_name": "",
-                "delete": true,
+                "connection_string": "<insert your connection string here>",
+                "container_name": "<insert the container name>",
                 "name": "Azure",
                 "provider": "Microsoft",
-                "rate_limit": 3600
+                "rate_limit": 3600,
+                "redis_cache_db": "5",
+                "redis_cache_host": "127.0.0.1",
+                "redis_cache_password": null,
+                "redis_cache_port": 6379,
+                "redis_cache_ttl": 864000
             }
         },
         "Microsoft Interflow": {
@@ -330,11 +357,6 @@
             "module": "intelmq.bots.parsers.abusech.parser_ip",
             "parameters": {}
         },
-        "Abuse.ch Ransomware": {
-            "description": "Abuse.ch Ransomware Parser is the bot responsible to parse the report and sanitize the information.",
-            "module": "intelmq.bots.parsers.abusech.parser_ransomware",
-            "parameters": {}
-        },
         "AlienVault": {
             "description": "AlienVault Parser is the bot responsible to parse the report and sanitize the information.",
             "module": "intelmq.bots.parsers.alienvault.parser",
@@ -348,7 +370,9 @@
         "AnubisNetworks Cyberfeed Stream": {
             "description": "Parses single JSON-events from AnubisNetworks Cyberfeed stream.",
             "module": "intelmq.bots.parsers.anubisnetworks.parser",
-            "parameters": {}
+            "parameters": {
+                "use_malware_familiy_as_classification_identifier": true
+            }
         },
         "Autoshun": {
             "description": "Autoshun Parser is the bot responsible to parse the report and sanitize the information.",
@@ -358,11 +382,6 @@
         "Bambenek": {
             "description": "Bambenek parser is the bot responsible to parse and and sanitize the information from the feeds available from Bambenek.",
             "module": "intelmq.bots.parsers.bambenek.parser",
-            "parameters": {}
-        },
-        "Bitcash Blocklist Feed": {
-            "description": "Bitcash Blocklist parser is the bot responsible to parse and sanitize the information.",
-            "module": "intelmq.bots.parsers.bitcash.parser",
             "parameters": {}
         },
         "Blocklist.de": {
@@ -396,13 +415,18 @@
             "parameters": {}
         },
         "Cymru CAP Program": {
-            "description": "Cymru CAP Program Parser parses and sanitizes .",
+            "description": "Cymru CAP Program Parser parses and sanitizes.",
             "module": "intelmq.bots.parsers.cymru.parser_cap_program",
             "parameters": {}
         },
         "Cymru Full Bogons": {
             "description": "Cymru Full Bogons Parser is the bot responsible to parse the report and sanitize the information.",
             "module": "intelmq.bots.parsers.cymru.parser_full_bogons",
+            "parameters": {}
+        },
+        "CZ.NIC HaaS": {
+            "description": "CZ.NIC HaaS Parser is the bot responsible to parse the report and sanitize the information.",
+            "module": "intelmq.bots.parsers.cznic.parser_haas",
             "parameters": {}
         },
         "DShield AS": {
@@ -435,16 +459,9 @@
             "module": "intelmq.bots.parsers.dyn.parser",
             "parameters": {}
         },
-        "Fraunhofer DDoS Attack C&C": {
-            "description": "Fraunhofer DDoS Attack C&C Feed Parser is the bot responsible to parse the report and sanitize the information.",
-            "module": "intelmq.bots.parsers.fraunhofer.parser_ddosattack_cnc",
-            "parameters": {
-                "unknown_messagetype_accuracy": 10.0
-            }
-        },
-        "Fraunhofer DDoS Attack Target": {
-            "description": "Fraunhofer DDoS Attack Target Feed Parser is the bot responsible to parse the report and sanitize the information.",
-            "module": "intelmq.bots.parsers.fraunhofer.parser_ddosattack_target",
+        "ESET": {
+            "description": "Parse data collected from ESET's TAXII API",
+            "module": "intelmq.bots.parsers.eset.parser",
             "parameters": {}
         },
         "Fraunhofer DGA": {
@@ -470,6 +487,11 @@
                 "type": "c2server",
                 "type_translation": null
             }
+        },
+        "Github feed": {
+            "description": "Github feed parser dependent of the feed URL. Parses only known github feeds.",
+            "module": "intelmq.bots.parsers.github_feed.parser",
+            "parameters": {}
         },
         "HTML Table": {
             "description": "HTML Table Parser is a bot configurable to parse different html table data.",
@@ -499,13 +521,6 @@
             "description": "Parses the data sent by the 'Have I Been Pwned' Callback for Enterprise Subscribers",
             "module": "intelmq.bots.parsers.hibp.parser_callback",
             "parameters": {}
-        },
-        "HpHosts": {
-            "description": "HpHosts Parser is the bot responsible to parse the report and sanitize the information.",
-            "module": "intelmq.bots.parsers.hphosts.parser",
-            "parameters": {
-                "error_log_message": false
-            }
         },
         "JSON": {
             "description": "JSON Parser converts from a JSON-String into an Event",
@@ -571,11 +586,6 @@
             "module": "intelmq.bots.parsers.netlab_360.parser",
             "parameters": {}
         },
-        "Nothink": {
-            "description": "Nothink Feed Parser is the bot responsible to parse the SNMP, SSH, Telnet, and DNS Attack reports and sanitize the information.",
-            "module": "intelmq.bots.parsers.nothink.parser",
-            "parameters": {}
-        },
         "OpenPhish": {
             "description": "OpenPhish Parser is the bot responsible to parse the report and sanitize the information.",
             "module": "intelmq.bots.parsers.openphish.parser",
@@ -630,9 +640,7 @@
         "Taichung": {
             "description": "Taichung Parser is the bot responsible to parse the report and sanitize the information.",
             "module": "intelmq.bots.parsers.taichung.parser",
-            "parameters": {
-                "error_log_message": false
-            }
+            "parameters": {}
         },
         "Threatminer": {
             "description": "Threatminer Parser is the bot responsible to parse the report and sanitize the information.",
@@ -652,11 +660,6 @@
                 "domain_whitelist": "t.co",
                 "substitutions": " .net;[.]net"
             }
-        },
-        "URLVir": {
-            "description": "URLVir Parser is the bot responsible to parse the Export Hosts and Export IP Addresses reports and sanitize the information.",
-            "module": "intelmq.bots.parsers.urlvir.parser",
-            "parameters": {}
         },
         "VXVault": {
             "description": "VXVault Parser is the bot responsible to parse the report and sanitize the information.",
@@ -682,14 +685,6 @@
                 "database": "/opt/intelmq/var/lib/bots/asn_lookup/ipasn.dat"
             }
         },
-        "CSV Converter": {
-            "description": "Converts data to CSV.",
-            "module": "intelmq.bots.experts.csv_converter.expert",
-            "parameters": {
-                "delimiter": ",",
-                "fieldnames": "time.source,classification.type,source.ip"
-            }
-        },
         "Abusix": {
             "description": "Abusix is the bot responsible to get the correspondent abuse contact from source IP and destination IP of the events.",
             "module": "intelmq.bots.experts.abusix.expert",
@@ -699,6 +694,14 @@
                 "redis_cache_password": null,
                 "redis_cache_port": "6379",
                 "redis_cache_ttl": "86400"
+            }
+        },
+        "CSV Converter": {
+            "description": "Converts data to CSV.",
+            "module": "intelmq.bots.experts.csv_converter.expert",
+            "parameters": {
+                "delimiter": ",",
+                "fieldnames": "time.source,classification.type,source.ip"
             }
         },
         "Cymru Whois": {
@@ -817,6 +820,14 @@
                 "test_mode": false
             }
         },
+        "MISP": {
+            "description": "An expert to for looking up values in MISP.",
+            "module": "intelmq.bots.experts.misp.expert",
+            "parameters": {
+                "misp_key": "<insert MISP Authkey>",
+                "misp_url": "<insert url of MISP server (with trailing '/')>"
+            }
+        },
         "MaxMind GeoIP": {
             "description": "MaxMind GeoIP is the bot responsible for adding geolocation information to events (Country, City, Longitude, Latitude, etc..)",
             "module": "intelmq.bots.experts.maxmind_geoip.expert",
@@ -840,6 +851,7 @@
             "parameters": {
                 "case_sensitive": true,
                 "configuration_path": "/opt/intelmq/var/lib/bots/modify/modify.conf",
+                "maximum_matches": null,
                 "overwrite": false
             }
         },
@@ -937,19 +949,11 @@
             "parameters": {
                 "overwrite": false
             }
-        },
-        "MISP": {
-            "description": "An expert to for looking up values in MISP.",
-            "module": "intelmq.bots.experts.misp.expert",
-            "parameters": {
-                "misp_key": "<insert MISP Authkey>",
-                "misp_url": "<insert url of MISP server (with trailing '/')>"
-            }
         }
     },
     "Output": {
         "AMQP Topic": {
-            "description": "AMQP Topic is the bot responsible to send events to a AMQP topic exchange.",
+            "description": "AMQP Topic is the bot responsible to send events to a AMQP topic exchange. Requires the pika python library.",
             "module": "intelmq.bots.outputs.amqptopic.output",
             "parameters": {
                 "connection_attempts": 3,
@@ -975,7 +979,7 @@
             }
         },
         "Blackhole": {
-            "description": "AMQP Topic is the bot responsible to send events to a AMQP topic exchange.",
+            "description": "Discards messages.",
             "module": "intelmq.bots.outputs.blackhole.output",
             "parameters": {}
         },
@@ -983,7 +987,6 @@
             "description": "Elasticsearch is the bot responsible to send events to a elasticsearch.",
             "module": "intelmq.bots.outputs.elasticsearch.output",
             "parameters": {
-                "elastic_doctype": "events",
                 "elastic_host": "127.0.0.1",
                 "elastic_index": "intelmq",
                 "elastic_port": 9200,
@@ -1026,6 +1029,32 @@
                 "tmp": "/opt/intelmq/var/lib/bots/files-output/tmp"
             }
         },
+        "MISP API": {
+            "description": "Insert events into a MISP instance.",
+            "module": "intelmq.bots.outputs.misp.output_api",
+            "parameters": {
+                "add_feed_name_as_tag": true,
+                "add_feed_provider_as_tag": true,
+                "misp_additional_correlation_fields": [],
+                "misp_additional_tags": [],
+                "misp_key": "<insert MISP Authkey>",
+                "misp_publish": false,
+                "misp_tag_for_bot": "<insert MISP tag to mark inserted events>",
+                "misp_to_ids_fields": [],
+                "misp_url": "<insert url of MISP server (with trailing '/')>",
+                "significant_fields": "<insert list of significant fields>"
+            }
+        },
+        "MISP Feed": {
+            "description": "Generate an output in MISP Feed format.",
+            "module": "intelmq.bots.outputs.misp.output_feed",
+            "parameters": {
+                "interval_event": "1 hour",
+                "misp_org_name": "<org name creating the events>",
+                "misp_org_uuid": "<org uuid creating the events>",
+                "output_dir": "/opt/intelmq/var/lib/bots/mispfeed-output"
+            }
+        },
         "McAfee ESM": {
             "description": "Writes information out to the McAfee Enterprise Security Manager (ESM).",
             "module": "intelmq.bots.outputs.mcafee.output_esm_ip",
@@ -1035,16 +1064,6 @@
                 "esm_user": "NGCP",
                 "esm_watchlist": "<watchlist name>",
                 "field": "source.ip"
-            }
-        },
-        "MISP Feed": {
-            "description": "Generate an output in MISP Feed format.",
-            "module": "intelmq.bots.outputs.misp.output_feed",
-            "parameters": {
-                "misp_org_name": "<org name creating the events>",
-                "misp_org_uuid": "<org uuid creating the events>",
-                "output_dir": "/opt/intelmq/var/lib/bots/mispfeed-output",
-                "interval_event": "1 hour"
             }
         },
         "MongoDB": {
